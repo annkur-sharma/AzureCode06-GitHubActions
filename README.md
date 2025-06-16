@@ -85,7 +85,7 @@ var.user_prefix
 ````
 
 # Output
-### 📤 Output values to user after successful execution of the code.
+### 📤 Output values displayed to user after successful execution of the code.
 ````yaml
 Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 
