@@ -7,6 +7,7 @@ AzureCode01-InfraSetup - To setup RG, Vnet, Subnet, NIC, NSG, Public IP, VM by d
 #### ❌ If the below resources are not present in the Azure Cloud, the terraform code will ❌ FAIL.
 ````yaml
 📝 .\INFRA01\backend-config-infra01.hcl
+
 ---------------------------------------------------------------------------------------------------
 # ✅ Update the values to be used to backend configuration.
 # ⚠️ This is pre-requisite to execute the code.
@@ -22,6 +23,7 @@ key                  = <ENTER backend - State File Name>         # Example: "a.t
 #### ✅ Update this with your own subscription ID.
 ````yaml
 📝 infra01.auto.tfvars
+
 ---------------------------------------------------------------------------------------------------
 # ✅ Update this with your own subscription ID.
 main_provider_subscription_id = "00000000-0000-0000-00000000"
@@ -31,6 +33,7 @@ main_provider_subscription_id = "00000000-0000-0000-00000000"
 #### All variables like Resource Group Location, VNet Address, Subnet Address needs to be updated.
 ````yaml
 📝 infra01.auto.tfvars
+
 ---------------------------------------------------------------------------------------------------
 # ✅ Update this with your own Azure region.
 root_resource_location        = "East US"
