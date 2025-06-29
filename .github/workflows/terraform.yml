@@ -27,11 +27,11 @@ jobs:
 
       - name: Terraform Init
         working-directory: INFRA01
-        run: terraform init
+        run: 'terraform init -backend-config="backend-config-infra01.hcl"'
 
       - name: Terraform Plan
         working-directory: INFRA01
-        run: terraform plan -out=tfplan
+        run: 'terraform plan -var "main_provider_subscription_id=%ARM_SUBSCRIPTION_ID%" -var "user_prefix=eagle987" -out=tfplan'
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
