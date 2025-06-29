@@ -26,11 +26,14 @@ jobs:
           terraform_version: 1.8.0
 
       - name: Terraform Init
+        working-directory: main/INFRA01
         run: terraform init
 
       - name: Terraform Plan
+        working-directory: main/INFRA01
         run: terraform plan -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
+        working-directory: main/INFRA01
         run: terraform apply -auto-approve tfplan
