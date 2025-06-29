@@ -1,5 +1,5 @@
-# AzureCode01-InfraSetup
-AzureCode01-InfraSetup - To setup RG, Vnet, Subnet, NIC, NSG, Public IP, VM by dynacally providing resource group name.
+# AzureCode05-GitHubActions
+AzureCode05-GitHubActions - To setup RG, Vnet, Subnet, NIC, NSG, Public IP, VM by dynacally providing resource group name.
 
 ## Step 01 - Update backend configuration in the below mentioned file.
 #### ✅ Update the values to be used to backend configuration.
