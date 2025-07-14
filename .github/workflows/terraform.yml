@@ -27,7 +27,7 @@ jobs:
 
       - name: Debug backend config
         working-directory: INFRA01
-        run: cat INFRA01/backend-config-infra01.hcl
+        run: cat backend-config-infra01.hcl
 
       - name: Terraform Init
         working-directory: INFRA01
