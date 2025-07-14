@@ -25,6 +25,9 @@ jobs:
         with:
           terraform_version: 1.8.0
 
+      - name: Debug backend config
+        run: cat main/infra01/backend-config-infra01.hcl
+
       - name: Terraform Init
         working-directory: INFRA01
         run: 'terraform init -backend-config="backend-config-infra01.hcl"'
