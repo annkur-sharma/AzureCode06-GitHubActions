@@ -12,3 +12,8 @@ variable "child_public_Ip_name" {
   type = string
   description = "The name of the public IP address"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "The tags for the resource"
+}

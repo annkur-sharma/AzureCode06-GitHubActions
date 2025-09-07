@@ -1,43 +1,86 @@
 name: Terraform CI
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
 
-jobs:
-  terraform:
-    name: 'Terraform Apply'
-    runs-on: ubuntu-latest
+permissions:
+  id-token: write
+  contents: read
 
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+jobs:
+  terraform-init-validate:
+    name: 'Terraform Init Validate'
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        continue-on-error: false
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.8.0
-
-      - name: Debug backend config
-        working-directory: INFRA01
-        run: cat backend-config-infra01.hcl
+          continue-on-error: false
 
       - name: Terraform Init
+        id: init
         working-directory: INFRA01
+        continue-on-error: false
         run: 'terraform init -backend-config="backend-config-infra01.hcl"'
 
+      - name: Terraform Validate
+        id: validate
+        working-directory: INFRA01
+        run: 'terraform validate'
+
+  terraform-init-fmt-plan:
+    name: 'Terraform Init Fmt Plan'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: terraform-init-validate
+    environment: dev
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        continue-on-error: false
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+        continue-on-error: false
+
+      - name: Terraform Init
+        id: init
+        working-directory: INFRA01
+        continue-on-error: false
+        run: 'terraform init -backend-config="backend-config-infra01.hcl"'
+
+      - name: Terraform Fmt
+        id: fmt
+        working-directory: INFRA01
+        continue-on-error: true
+        run: 'terraform fmt'
+
       - name: Terraform Plan
+        id: plan
         working-directory: INFRA01
         run: 'terraform plan -var "main_provider_subscription_id=%ARM_SUBSCRIPTION_ID%" -var "user_prefix=eagle987" -out=tfplan'
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        working-directory: INFRA01
-        run: terraform apply -auto-approve tfplan
+      # - name: Terraform Apply
+      #   if: github.ref == 'refs/heads/main'
+      #   working-directory: INFRA01
+      #   run: terraform apply -auto-approve tfplan

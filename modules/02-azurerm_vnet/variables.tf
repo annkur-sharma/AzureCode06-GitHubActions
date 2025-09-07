@@ -17,3 +17,8 @@ variable "child_resource_location" {
   type = string
   description = "The Azure region where the virtual network will be created"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "The tags for the resource"
+}

@@ -11,7 +11,8 @@ resource "azurerm_linux_virtual_machine" "child_virtual_machine" {
   network_interface_ids = [
     data.azurerm_network_interface.get_child_nic.id
   ]
-
+  tags = var.tags
+  
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"

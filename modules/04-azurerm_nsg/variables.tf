@@ -12,3 +12,8 @@ variable "child_nsg_name" {
   type = string
   description = "The name of the network security group"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "The tags for the resource"
+}

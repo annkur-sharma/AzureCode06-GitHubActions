@@ -27,3 +27,8 @@ variable "child_nic_name" {
   description = "The name of the child NIC"
   type        = string
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "The tags for the resource"
+}

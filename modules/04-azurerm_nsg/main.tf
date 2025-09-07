@@ -2,6 +2,7 @@ resource "azurerm_network_security_group" "child_nsg" {
   name                = var.child_nsg_name
   location            = var.child_resource_location
   resource_group_name = var.child_resource_group_name
+  tags = var.tags
 
   security_rule {
     name                       = "AllowSSH"

@@ -1,7 +1,16 @@
+resource "random_string" "root_random_string" {
+  length  = 6
+  upper   = false
+  lower   = true
+  numeric = true
+  special = false
+}
+
 module "module_resource_group" {
   source                    = "../modules/01-azurerm_resource_group"
   child_resource_group_name = "${var.root_resource_group_name}-${local.formatted_user_prefix}"
   child_resource_location   = var.root_resource_location
+  tags = local.common_tags
 }
 
 module "module_virtual_network" {
@@ -11,6 +20,7 @@ module "module_virtual_network" {
   child_resource_location   = var.root_resource_location
   child_vnet_name           = "${local.formatted_user_prefix}-${var.root_vnet_name}"
   child_vnet_address_space  = var.root_vnet_address_space
+  tags = local.common_tags
 }
 
 module "module_subnet" {
@@ -20,6 +30,7 @@ module "module_subnet" {
   child_vnet_name               = "${local.formatted_user_prefix}-${var.root_vnet_name}"
   child_subnet_name             = "${local.formatted_user_prefix}-${var.root_subnet_name}"
   child_subnet_address_prefixes = var.root_subnet_address_prefixes
+  tags = local.common_tags
 }
 
 module "module_nsg" {
@@ -28,6 +39,7 @@ module "module_nsg" {
   child_resource_group_name = "${var.root_resource_group_name}-${local.formatted_user_prefix}"
   child_nsg_name            = "${local.formatted_user_prefix}-${var.root_nsg_name}"
   child_resource_location   = var.root_resource_location
+  tags = local.common_tags
 }
 
 module "module_public_ip" {
@@ -36,6 +48,7 @@ module "module_public_ip" {
   child_resource_group_name = "${var.root_resource_group_name}-${local.formatted_user_prefix}"
   child_public_Ip_name      = "${local.formatted_user_prefix}-${var.root_public_Ip_name}"
   child_resource_location   = var.root_resource_location
+  tags = local.common_tags
 }
 
 module "module_nic" {
@@ -67,4 +80,5 @@ module "module_virtual_machine" {
   child_virtual_machine_username = "${local.formatted_user_prefix}-${var.root_virtual_machine_username}"
   child_virtual_machine_password = "${local.formatted_user_prefix}-${var.root_virtual_machine_password}"
   child_nic_name                 = "${local.formatted_user_prefix}-${var.root_nic_name}"
+  tags = local.common_tags
 }
