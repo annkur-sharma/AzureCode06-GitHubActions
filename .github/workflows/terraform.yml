@@ -1,12 +1,13 @@
 name: Terraform CI
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  workflow_dispatch:   # 👈 only run manually (safe for prod)
+  # pull_request:
+  #   branches:
+  #     - main
+  # push:
+  #   branches:
+  #     - main
 
 permissions:
   id-token: write
