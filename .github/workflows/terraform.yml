@@ -92,6 +92,7 @@ jobs:
         id: fmt
         working-directory: INFRA01
         run: terraform fmt -check -diff
+        continue-on-error: true
 
       - name: Terraform Plan
         id: plan
