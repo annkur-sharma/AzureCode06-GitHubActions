@@ -42,7 +42,7 @@ jobs:
         id: init
         working-directory: INFRA01
         continue-on-error: false
-        run: terraform init -backend-config="backend-config-infra01.hcl" -input=false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
 
       - name: Terraform Validate
         id: validate
@@ -76,7 +76,7 @@ jobs:
         id: init
         working-directory: INFRA01
         continue-on-error: false
-        run: terraform init -backend-config="backend-config-infra01.hcl" -input=false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
 
       - name: Terraform Fmt
         id: fmt
@@ -121,7 +121,7 @@ jobs:
         id: init
         working-directory: INFRA01
         continue-on-error: false
-        run: terraform init -backend-config="backend-config-infra01.hcl" -input=false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
 
       - name: Download plan
         uses: actions/download-artifact@v4
