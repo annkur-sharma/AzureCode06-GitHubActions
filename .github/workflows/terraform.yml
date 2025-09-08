@@ -11,11 +11,13 @@ on:
 permissions:
   id-token: write
   contents: read
+  actions: write   # needed for upload/download-artifact
 
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TERRAFORM_VERSION: 1.8.0
 
 jobs:
   terraform-init-validate:
@@ -36,7 +38,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.0
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Terraform Init
         id: init
@@ -47,7 +49,7 @@ jobs:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          # ARM_USE_OIDC = true # removed (redundant, azure/login already handles it)
 
       - name: Terraform Validate
         id: validate
@@ -75,7 +77,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.0
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Terraform Init
         id: init
@@ -86,7 +88,7 @@ jobs:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          # ARM_USE_OIDC = true # removed (redundant, azure/login already handles it)
 
       - name: Terraform Fmt
         id: fmt
@@ -102,7 +104,7 @@ jobs:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          # ARM_USE_OIDC = true # removed (redundant, azure/login already handles it)
 
       - name: Upload plan
         uses: actions/upload-artifact@v4
@@ -131,7 +133,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.8.0
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Terraform Init
         id: init
@@ -142,7 +144,7 @@ jobs:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          # ARM_USE_OIDC = true # removed (redundant, azure/login already handles it)
 
       - name: Download plan
         uses: actions/download-artifact@v4
@@ -157,5 +159,5 @@ jobs:
           ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
           ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          ARM_USE_OIDC: true
+          # ARM_USE_OIDC = true # removed (redundant, azure/login already handles it)
         
