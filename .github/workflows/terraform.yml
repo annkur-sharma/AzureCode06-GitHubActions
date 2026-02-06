@@ -61,12 +61,12 @@ jobs:
       - name: TFLint
         uses: terraform-linters/tflint-action@v1
         with:
-          working-directory: INFRA01
+          working-directory: ../../INFRA01
 
       - name: tfsec
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
-          working-directory: INFRA01
+          working-directory: ../../INFRA01
 
   terraform-init-fmt-plan:
     name: 'Terraform Init Fmt Plan'
