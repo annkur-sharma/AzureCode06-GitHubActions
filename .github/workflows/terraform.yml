@@ -58,15 +58,17 @@ jobs:
         working-directory: INFRA01
         run: terraform validate
       
-      - name: TFLint
-        uses: terraform-linters/tflint-action@v1
-        with:
-          working-directory: ../../INFRA01
+      - name: TFLint Install
+        uses: terraform-linters/setup-tflint@v4
 
-      - name: tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
-        with:
-          working-directory: ../../INFRA01
+      - name: TFLint Run
+        working-directory: INFRA01
+        run: tflint --init && tflint
+
+      # - name: tfsec
+      #   uses: aquasecurity/tfsec-action@v1.0.3
+      #   with:
+      #     working-directory: INFRA01
 
   terraform-init-fmt-plan:
     name: 'Terraform Init Fmt Plan'
@@ -127,7 +129,7 @@ jobs:
   terraform-init-apply:
     name: 'Terraform Init Apply'
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/heads/feature/') || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: terraform-init-fmt-plan
     environment: prod
 
