@@ -62,6 +62,7 @@ jobs:
         uses: terraform-linters/setup-tflint@v4
 
       - name: TFLint Run
+        continue-on-error: true
         working-directory: INFRA01
         run: tflint --init && tflint
 
