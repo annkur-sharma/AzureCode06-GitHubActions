@@ -92,12 +92,12 @@ jobs:
           name: tflint-json
           path: INFRA01/tflint-report.json
 
-      - name: Clone DevOps Utilities (private)
-        env:
-          GH_TOKEN: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
-        run: |
-          set -e
-          git clone https://x-access-token:${GH_TOKEN}@github.com/annkur-sharma/PythonCode01-DevOpsUtilities.git
+      - name: Checkout DevOps Utilities (private)
+        uses: actions/checkout@v4
+        with:
+          repository: annkur-sharma/PythonCode01-DevOpsUtilities
+          token: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
+          path: PythonCode01-DevOpsUtilities
 
       - name: Assess TFLint JSON using Python Utilities
         env:
