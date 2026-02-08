@@ -66,25 +66,6 @@ jobs:
         working-directory: INFRA01
         run: tflint --init && tflint
 
-      - name: TFLint Run (SARIF)
-        continue-on-error: true
-        working-directory: INFRA01
-        run: | 
-          tflint --init
-          tflint --format sarif > tflint.sarif
-
-      - name: Upload TFLint (SARIF)
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: INFRA01/tflint.sarif
-
-      - name: TFLint Run (JSON)
-        continue-on-error: true
-        working-directory: INFRA01
-        run: | 
-          tflint --init
-          tflint --format json > tflint-report.json
-
       # - name: tfsec
       #   uses: aquasecurity/tfsec-action@v1.0.3
       #   with:
