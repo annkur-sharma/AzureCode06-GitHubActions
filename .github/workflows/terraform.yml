@@ -92,6 +92,21 @@ jobs:
           name: tflint-json
           path: INFRA01/tflint-report.json
 
+      - name: Clone DevOps Utilities (private)
+        env:
+          GH_TOKEN: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
+        run: |
+          set -e
+          git clone https://x-access-token:${GH_TOKEN}@github.com/annkur-sharma/PythonCode01-DevOpsUtilities.git
+
+      - name: Assess TFLint JSON using Python Utilities
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # optional
+        run: |
+          set -e
+          python3 PythonCode01-DevOpsUtilities/tflint/tflint_summary.py INFRA01/tflint-report.json
+
+
       # - name: tfsec
       #   uses: aquasecurity/tfsec-action@v1.0.3
       #   with:
