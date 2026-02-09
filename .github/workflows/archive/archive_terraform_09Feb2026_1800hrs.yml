@@ -1,0 +1,223 @@
+name: Terraform CI
+
+on:
+  workflow_dispatch:   # 👈 only run manually (safe for prod)
+  # pull_request:
+  #   branches:
+  #     - main
+  # push:
+  #   branches:
+  #     - main
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write   # needed for upload/download-artifact
+  security-events: write 
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TERRAFORM_VERSION: 1.8.0
+
+jobs:
+  terraform-init-validate:
+    name: 'Terraform Init Validate'
+    if: startsWith(github.ref, 'refs/heads/feature/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        id: init
+        working-directory: INFRA01
+        continue-on-error: false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
+        env:
+          ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
+          ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: INFRA01
+        run: terraform validate
+      
+      - name: TFLint Install
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: TFLint Run
+        continue-on-error: true
+        working-directory: INFRA01
+        run: tflint --init && tflint
+
+      - name: TFLint Run (SARIF)
+        continue-on-error: true
+        working-directory: INFRA01
+        run: | 
+          tflint --init
+          tflint --format sarif > tflint.sarif || true
+
+      - name: Upload TFLint (SARIF)
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: INFRA01/tflint.sarif
+
+      - name: TFLint Run (JSON)
+        continue-on-error: true
+        working-directory: INFRA01
+        run: | 
+          tflint --init
+          tflint --format json > tflint-report.json
+
+      - name: Upload TFLint JSON Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tflint-json
+          path: INFRA01/tflint-report.json
+
+      - name: Checkout DevOps Utilities (private)
+        uses: actions/checkout@v4
+        with:
+          repository: annkur-sharma/PythonCode01-DevOpsUtilities
+          token: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
+          path: PythonCode01-DevOpsUtilities
+
+      - name: Assess TFLint JSON using Python Utilities
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # optional
+          CI_REPO: ${{ github.repository }}
+          CI_BRANCH: ${{ github.ref_name }}
+          CI_RUN_ID: ${{ github.run_id }}
+          CI_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -e
+          python3 PythonCode01-DevOpsUtilities/tflint/tflint_summary.py INFRA01/tflint-report.json
+
+
+      # - name: tfsec
+      #   uses: aquasecurity/tfsec-action@v1.0.3
+      #   with:
+      #     working-directory: INFRA01
+
+  terraform-init-fmt-plan:
+    name: 'Terraform Init Fmt Plan'
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/feature/')
+    needs: terraform-init-validate
+    environment: dev
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        id: init
+        working-directory: INFRA01
+        continue-on-error: false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
+        env:
+          ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
+          ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Terraform Fmt
+        id: fmt
+        working-directory: INFRA01
+        run: terraform fmt -check -diff
+        continue-on-error: true
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: INFRA01
+        run: terraform plan -out=tfplan
+        env:
+          ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
+          ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: INFRA01/tfplan
+
+  terraform-init-apply:
+    name: 'Terraform Init Apply'
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: terraform-init-fmt-plan
+    environment: prod
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+          
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        id: init
+        working-directory: INFRA01
+        continue-on-error: false
+        run: terraform init -backend-config="backend-config-infra01.hcl"
+        env:
+          ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
+          ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: INFRA01
+
+      - name: Terraform Apply
+        working-directory: INFRA01
+        run: terraform apply -auto-approve tfplan
+        env:
+          ARM_CLIENT_ID: ${{ env.ARM_CLIENT_ID }}
+          ARM_TENANT_ID: ${{ env.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
+          ARM_USE_OIDC: true
+        
