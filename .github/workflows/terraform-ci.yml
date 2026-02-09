@@ -12,7 +12,7 @@ permissions:
 jobs:
   validate:
     if: startsWith(github.ref, 'refs/heads/feature/')
-    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v2
+    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v3
     with:
       working_directory: INFRA01
     secrets:
