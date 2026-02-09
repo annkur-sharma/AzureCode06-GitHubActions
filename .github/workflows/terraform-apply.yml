@@ -20,7 +20,6 @@ env:
 jobs:
   apply:
     runs-on: ubuntu-latest
-    environment: prod
 
     steps:
       - uses: actions/checkout@v4
