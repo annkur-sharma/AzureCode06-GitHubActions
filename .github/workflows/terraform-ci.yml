@@ -12,7 +12,7 @@ permissions:
 jobs:
   validate:
     if: startsWith(github.ref, 'refs/heads/feature/')
-    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v1
+    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v2
     with:
       working_directory: INFRA01
     secrets:
@@ -23,7 +23,7 @@ jobs:
   plan:
     needs: validate
     if: startsWith(github.ref, 'refs/heads/feature/')
-    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v1
+    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v2
     with:
       working_directory: INFRA01
     secrets:
@@ -34,7 +34,7 @@ jobs:
   apply:
     needs: plan
     if: github.ref == 'refs/heads/main'
-    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v1
+    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v2
     with:
       working_directory: INFRA01
     secrets:
