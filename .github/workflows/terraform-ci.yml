@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   validate:
-    if: startsWith(github.ref, 'refs/heads/main/')
+    # if: startsWith(github.ref, 'refs/heads/main/')
+    if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v3
     with:
       working_directory: INFRA01
@@ -22,7 +23,8 @@ jobs:
 
   plan:
     # needs: validate
-    if: startsWith(github.ref, 'refs/heads/main/')
+    # if: startsWith(github.ref, 'refs/heads/main/')
+    if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v2
     with:
       working_directory: INFRA01
