@@ -68,5 +68,6 @@ jobs:
           VALIDATE_STATUS: ${{ needs.validate.result }}
           PLAN_STATUS: ${{ needs.plan.result }}
           APPLY_STATUS: ${{ needs.apply.result }}
+          GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
         run: |
           python3 PythonCode01-DevOpsUtilities/slack/slack_notifier_github_actions_v1.py
