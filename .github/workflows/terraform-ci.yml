@@ -15,7 +15,10 @@ jobs:
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v1
     with:
       working_directory: INFRA01
-    secrets: inherit
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   plan:
     needs: validate
@@ -23,7 +26,10 @@ jobs:
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v1
     with:
       working_directory: INFRA01
-    secrets: inherit
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   apply:
     needs: plan
@@ -31,4 +37,7 @@ jobs:
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v1
     with:
       working_directory: INFRA01
-    secrets: inherit
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
