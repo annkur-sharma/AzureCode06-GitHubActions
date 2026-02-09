@@ -34,7 +34,7 @@ jobs:
   apply:
     # needs: plan
     if: github.ref == 'refs/heads/main'
-    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v2
+    uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v4
     with:
       working_directory: INFRA01
     secrets:
