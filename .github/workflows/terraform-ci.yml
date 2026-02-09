@@ -43,3 +43,30 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+  notify:
+    name: Slack Notification
+    needs: [validate, plan, apply]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout DevOps Utilities
+        uses: actions/checkout@v4
+        with:
+          repository: annkur-sharma/PythonCode01-DevOpsUtilities
+          token: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
+          path: PythonCode01-DevOpsUtilities
+
+      - name: Send Slack Notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CI_REPO: ${{ github.repository }}
+          CI_BRANCH: ${{ github.ref_name }}
+          CI_RUN_ID: ${{ github.run_id }}
+          CI_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VALIDATE_STATUS: ${{ needs.validate.result }}
+          PLAN_STATUS: ${{ needs.plan.result }}
+          APPLY_STATUS: ${{ needs.apply.result }}
+        run: |
+          python3 PythonCode01-DevOpsUtilities/slack/slack_notifier_github_actions_v1.py
