@@ -21,7 +21,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   plan:
-    needs: validate
+    # needs: validate
     if: startsWith(github.ref, 'refs/heads/feature/')
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v2
     with:
@@ -32,7 +32,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   apply:
-    needs: plan
+    # needs: plan
     if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v2
     with:
