@@ -51,8 +51,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout DevOps Utilities (private) # works with private repo
+      uses: actions/checkout@v4
+      with:
+        repository: annkur-sharma/PythonCode01-DevOpsUtilities
+        token: ${{ secrets.DEVOPS_UTILS_REPO_TOKEN }}
+        path: devops-utils
+
     - name: Send Slack Notification
-      uses: annkur-sharma/PythonCode01-DevOpsUtilities/.github/actions/slack-notify@v1
+      # uses: annkur-sharma/PythonCode01-DevOpsUtilities/.github/actions/slack-notify@v1 # works with public repo
+      uses: ./devops-utils/.github/actions/slack-notify # works with private repo, no tag needed
       with:
         slack_webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
 
