@@ -9,16 +9,26 @@ permissions:
   actions: write
   security-events: write
 
-jobs:
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # Define the URL once here to keep it DRY
+  VM_URL: ${{ vars.VM_URL }}
 
+jobs:
   AI-Risk-Assessment:
-    id: ai_predict  # This is the ID we will reference later
-    uses: annkur-sharma/AI-Utility01/predict@v8
-    env:
-      VM_URL: ${{ env.VM_URL }} # Matches the global env above
+    runs-on: ubuntu-latest
+    outputs:
+      txn_uuid: ${{ steps.predict.outputs.txn_uuid }}
+    steps:
+      - name: AI Prediction
+        id: predict
+        uses: annkur-sharma/AI-Utility01/predict@v8
+        env:
+          VM_URL: ${{ env.VM_URL }}
 
   validate:
     # if: startsWith(github.ref, 'refs/heads/main/')
+    needs: [AI-Risk-Assessment]
     if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-validate.yml@v3
     with:
@@ -29,7 +39,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   plan:
-    # needs: validate
+    needs: validate
     # if: startsWith(github.ref, 'refs/heads/main/')
     if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-plan.yml@v2
@@ -41,7 +51,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
   apply:
-    # needs: plan
+    needs: plan
     if: github.ref == 'refs/heads/main'
     uses: annkur-sharma/AzureCode06-GitHubActions/.github/workflows/terraform-apply.yml@v4
     with:
@@ -50,6 +60,21 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+# 3. FEEDBACK: Send the final build outcome back to AI for retraining
+  Send-Final-Outcome-to-AI:
+    needs: [AI-Risk-Assessment, validate, plan, apply]
+    if: always() 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post Feedback to C.O.R.E.AI
+        uses: annkur-sharma/AI-Utility01/feedback@v8
+        env:
+          VM_URL: ${{ env.VM_URL }}
+        with:
+          # Accessing the output from the first job via 'needs'
+          txn_uuid: ${{ needs.AI-Risk-Assessment.outputs.txn_uuid }}
+          outcome: ${{ job.status }}
 
   notify:
     name: Slack Notification
@@ -78,16 +103,7 @@ jobs:
         validate_status: ${{ needs.validate.result }}
         plan_status: ${{ needs.plan.result }}
         apply_status: ${{ needs.apply.result }}
-
-  Send-Final-Outcome-to-AI:
-    if: always() # CRITICAL: Ensure feedback runs even if build fails
-    uses: annkur-sharma/AI-Utility01/feedback@v8
-    env:
-      VM_URL: ${{ env.VM_URL }}
-    with:
-    # Ensure this ID matches the 'id' in the assessment step above
-      txn_uuid: ${{ steps.ai_predict.outputs.txn_uuid }}
-      outcome: ${{ job.status }}
+        
       # - name: Checkout DevOps Utilities
       #   uses: actions/checkout@v4
       #   with:
