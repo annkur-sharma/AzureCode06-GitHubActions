@@ -100,6 +100,3 @@ root_output_public_ip = "17.x.x.x"                        # ⚠️ For informati
 root_output_resource_group_name = "rg-lion9876"           # ✅ Resource group created with 'rg-' as prefix and user input as suffix.
 root_output_virtual_machine = "lion9876-VM"               # ✅ Virtual Machine user input as prefix and '-VM' as suffix.
 ````
-
-
-
