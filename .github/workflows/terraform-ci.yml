@@ -2,6 +2,10 @@ name: Terraform CI
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   id-token: write
@@ -103,7 +107,7 @@ jobs:
         validate_status: ${{ needs.validate.result }}
         plan_status: ${{ needs.plan.result }}
         apply_status: ${{ needs.apply.result }}
-        
+
       # - name: Checkout DevOps Utilities
       #   uses: actions/checkout@v4
       #   with:
