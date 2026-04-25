@@ -73,7 +73,7 @@ jobs:
 # 3. FEEDBACK: Send the final build outcome back to AI for retraining
   Send-Final-Outcome-to-AI:
     needs: [AI-Risk-Assessment, validate, plan, apply]
-    if: always() 
+    if: always() && needs.AI-Risk-Assessment.outputs.txn_uuid != ''
     runs-on: ubuntu-latest
     steps:
       - name: Post Feedback to C.O.R.E.AI
@@ -83,7 +83,12 @@ jobs:
         with:
           # Accessing the output from the first job via 'needs'
           txn_uuid: ${{ needs.AI-Risk-Assessment.outputs.txn_uuid }}
-          outcome: ${{ job.status }}
+          outcome: >-
+            ${{ 
+              (needs.validate.result == 'failure' || 
+               needs.plan.result == 'failure' || 
+               needs.apply.result == 'failure') && 'failure' || 'success' 
+            }}
 
   notify:
     name: Slack Notification
