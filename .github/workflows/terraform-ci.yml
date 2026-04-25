@@ -10,6 +10,13 @@ permissions:
   security-events: write
 
 jobs:
+
+  AI-Risk-Assessment:
+    id: ai_predict  # This is the ID we will reference later
+    uses: annkur-sharma/AI-Utility01/predict@v8
+    env:
+      VM_URL: ${{ env.VM_URL }} # Matches the global env above
+
   validate:
     # if: startsWith(github.ref, 'refs/heads/main/')
     if: github.ref == 'refs/heads/main'
@@ -72,7 +79,15 @@ jobs:
         plan_status: ${{ needs.plan.result }}
         apply_status: ${{ needs.apply.result }}
 
-
+  Send-Final-Outcome-to-AI:
+    if: always() # CRITICAL: Ensure feedback runs even if build fails
+    uses: annkur-sharma/AI-Utility01/feedback@v8
+    env:
+      VM_URL: ${{ env.VM_URL }}
+    with:
+    # Ensure this ID matches the 'id' in the assessment step above
+      txn_uuid: ${{ steps.ai_predict.outputs.txn_uuid }}
+      outcome: ${{ job.status }}
       # - name: Checkout DevOps Utilities
       #   uses: actions/checkout@v4
       #   with:
