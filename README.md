@@ -101,6 +101,3 @@ root_output_resource_group_name = "rg-lion9876"           # ✅ Resource group c
 root_output_virtual_machine = "lion9876-VM"               # ✅ Virtual Machine user input as prefix and '-VM' as suffix.
 ````
 
-
-
-
