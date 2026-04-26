@@ -12,3 +12,15 @@ variable "child_nsg_name" {
   description = "The name of the Network Security Group to associate with the NIC."
   type        = string
 }
+
+
+
+
+
+
+
+
+
+
+
+

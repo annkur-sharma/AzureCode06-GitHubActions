@@ -13,3 +13,14 @@ resource "azurerm_network_interface_security_group_association" "child_nic_nsg_a
 
 
 
+
+
+
+
+
+
+
+
+
+
+
