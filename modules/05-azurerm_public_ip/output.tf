@@ -4,16 +4,3 @@ output "child_output_public_IP" {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-

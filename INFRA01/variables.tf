@@ -115,3 +115,14 @@ variable "root_virtual_machine_password" {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
