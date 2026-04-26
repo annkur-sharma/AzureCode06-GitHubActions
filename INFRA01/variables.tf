@@ -88,3 +88,30 @@ variable "root_virtual_machine_password" {
   type        = string
   description = "The password for the virtual machine."
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
